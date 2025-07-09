@@ -13,6 +13,7 @@ public class ShapeManager : MonoBehaviour
     [SerializeField] GridManager _gridManager;
 
     private List<Shape> _shapes = new List<Shape>();
+    private List<Shape> _ghostShapes = new List<Shape>();
     private int _moveCount = 0;
 
     public InputAction shapeMovement;
@@ -23,18 +24,24 @@ public class ShapeManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if (_shapePrefabs.Count != _startingPositions.Count)
+        InstantiateShapes(_shapePrefabs, _startingPositions, _shapes);
+        InstantiateShapes(_ghostShapePrefabs, _ghostStartingPositions, _ghostShapes);
+    }
+
+    private void InstantiateShapes(List<GameObject> prefabs, List<Vector2Int> startPositions, List<Shape> shapes)
+    {
+        if (prefabs.Count != startPositions.Count)
         {
             Debug.LogError("Shapes and Starting Positions count do not match");
             return;
         }
 
-        for (int i = 0; i < _shapePrefabs.Count; i++)
+        for (int i = 0; i < prefabs.Count; i++)
         {
             // Instantiate shape prefab
-            var shapeInstance = Instantiate(_shapePrefabs[i]);
+            var shapeInstance = Instantiate(prefabs[i]);
             Shape shapeComponent = shapeInstance.GetComponent<Shape>();
-            var startPosition = _startingPositions[i];
+            var startPosition = startPositions[i];
 
             if (shapeComponent != null)
             {
@@ -43,15 +50,15 @@ public class ShapeManager : MonoBehaviour
                 startPosition.y = Mathf.Clamp(startPosition.y, 0, _gridManager.Height - 1);
 
                 // Setting the shape position
-                shapeComponent.GridPosition = _startingPositions[i];
+                shapeComponent.GridPosition = startPositions[i];
                 shapeInstance.transform.position = new Vector3(shapeComponent.GridPosition.x, shapeComponent.GridPosition.y, 0);
 
-                _shapes.Add(shapeComponent);
+                shapes.Add(shapeComponent);
                 Debug.Log($"{shapeComponent.name} initialized at {shapeComponent.GridPosition}");
             }
             else
             {
-                Debug.LogError($"Shape component missing on prefab: {_shapePrefabs[i].name}");
+                Debug.LogError($"Shape component missing on prefab: {prefabs[i].name}");
             }
         }
     }

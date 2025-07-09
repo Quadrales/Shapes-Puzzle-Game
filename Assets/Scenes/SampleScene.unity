@@ -204,54 +204,62 @@ MonoBehaviour:
   - {x: 0, y: 0}
   - {x: 1, y: 1}
   - {x: 2, y: 2}
+  _ghostShapePrefabs:
+  - {fileID: 2358223514503129281, guid: 39b0a237e8ada214ba70b31535c52580, type: 3}
+  - {fileID: 8962216153291555913, guid: a687797d42deb0d4cb2ab1ce2836d687, type: 3}
+  - {fileID: 3025994135358594287, guid: a0ab53a33733fb945abd9b7e9c53cd6e, type: 3}
+  _ghostStartingPositions:
+  - {x: 3, y: 3}
+  - {x: 4, y: 4}
+  - {x: 5, y: 5}
   _gridManager: {fileID: 194485433}
-  playerMovement:
-    m_Name: Player Movement
+  shapeMovement:
+    m_Name: Shape Movement
     m_Type: 0
     m_ExpectedControlType: 
-    m_Id: 29f5b977-ed85-4c72-94d7-51688306e9df
+    m_Id: 25903315-0a3b-4e3e-8d86-abec76484bca
     m_Processors: 
     m_Interactions: 
     m_SingletonActionBindings:
     - m_Name: 2D Vector
-      m_Id: 950780a7-db74-43f6-8228-dfb8b8bf48c9
+      m_Id: 95652ba2-b342-40a7-b838-cb8171f83312
       m_Path: 2DVector
       m_Interactions: 
       m_Processors: 
       m_Groups: 
-      m_Action: Player Movement
+      m_Action: Shape Movement
       m_Flags: 4
     - m_Name: up
-      m_Id: 6a651510-48fc-47c5-ad18-263473ea8df4
+      m_Id: c31ff260-29d0-4ff0-87e6-9a839ac3eed3
       m_Path: <Keyboard>/w
       m_Interactions: 
       m_Processors: 
       m_Groups: 
-      m_Action: Player Movement
+      m_Action: Shape Movement
       m_Flags: 8
     - m_Name: down
-      m_Id: a9e0115f-ef97-4f26-9ac0-90b686883236
+      m_Id: 3fc9ae48-fe32-4a22-8b99-4db695691643
       m_Path: <Keyboard>/s
       m_Interactions: 
       m_Processors: 
       m_Groups: 
-      m_Action: Player Movement
+      m_Action: Shape Movement
       m_Flags: 8
     - m_Name: left
-      m_Id: 1f9cda4c-88a4-4fe4-bf9a-2fd171d1c548
+      m_Id: 35e20f38-9fc8-49c5-aa43-2aff30645ed8
       m_Path: <Keyboard>/a
       m_Interactions: 
       m_Processors: 
       m_Groups: 
-      m_Action: Player Movement
+      m_Action: Shape Movement
       m_Flags: 8
     - m_Name: right
-      m_Id: f63545bd-fd9a-43f1-91b3-9a557bdd9162
+      m_Id: 50da4aa7-2608-4fbb-84e8-e52e33fe0307
       m_Path: <Keyboard>/d
       m_Interactions: 
       m_Processors: 
       m_Groups: 
-      m_Action: Player Movement
+      m_Action: Shape Movement
       m_Flags: 8
     m_Flags: 0
   moveCooldown: 0.1
