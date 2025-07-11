@@ -76,6 +76,7 @@ public class ShapeManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // fix move cooldown, still doesn't work
         moveTimer -= Time.deltaTime;
 
         Vector2 moveInput = shapeMovement.ReadValue<Vector2>();
@@ -85,7 +86,6 @@ public class ShapeManager : MonoBehaviour
         {
             _moveCount++;
             MoveShapes(moveDirection);
-            Debug.Log("Move Direction: " + moveDirection);
             moveTimer = moveCooldown;
         }
     }
@@ -108,7 +108,20 @@ public class ShapeManager : MonoBehaviour
             // Only move if current move count is divisible by this shape's edge count
             if ((shape.EdgeCount == 1) || (_moveCount % shape.EdgeCount == 0))
             {
-                Vector2Int newPosition = shape.GridPosition + direction;
+                Vector2Int currentPosition = shape.GridPosition;
+
+                int maxX = _gridManager.Width - 1;
+                int maxY = _gridManager.Height - 1;
+
+                // Calculate new grid position, ensuring a wrap-around grid
+                Vector2Int newPosition = (direction.x, direction.y, currentPosition.x, currentPosition.y) switch
+                {
+                    (0, 1, _, var y) when y == maxY => new Vector2Int(currentPosition.x, 0), // Up
+                    (0, -1, _, 0) => new Vector2Int(currentPosition.x, maxY), // Down
+                    (-1, 0, 0, _) => new Vector2Int(maxX, currentPosition.y), // Left
+                    (1, 0, var x, _) when x == maxX => new Vector2Int(0, currentPosition.y), // Right
+                    _ => currentPosition + direction
+                };
 
                 // Ensure shapes stay within bounds and position isn't occupied
                 if ((newPosition.x >= 0 && newPosition.x < _gridManager.Width) &&
