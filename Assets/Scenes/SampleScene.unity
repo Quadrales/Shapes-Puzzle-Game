@@ -262,7 +262,7 @@ MonoBehaviour:
       m_Action: Shape Movement
       m_Flags: 8
     m_Flags: 0
-  moveCooldown: 0.1
+  moveCooldown: 0.2
 --- !u!4 &236063705
 Transform:
   m_ObjectHideFlags: 0

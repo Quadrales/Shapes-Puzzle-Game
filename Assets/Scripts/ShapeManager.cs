@@ -15,6 +15,7 @@ public class ShapeManager : MonoBehaviour
     private List<Shape> _shapes = new List<Shape>();
     private List<Shape> _ghostShapes = new List<Shape>();
     private int _moveCount = 0;
+    private List<Shape> _completedShapes = new List<Shape>();
 
     public InputAction shapeMovement;
 
@@ -26,6 +27,11 @@ public class ShapeManager : MonoBehaviour
     {
         InstantiateShapes(_shapePrefabs, _startingPositions, _shapes);
         InstantiateShapes(_ghostShapePrefabs, _ghostStartingPositions, _ghostShapes);
+
+        foreach (var ghostShape in _ghostShapes)
+        {
+            
+        }
     }
 
     private void InstantiateShapes(List<GameObject> prefabs, List<Vector2Int> startPositions, List<Shape> shapes)
@@ -126,7 +132,8 @@ public class ShapeManager : MonoBehaviour
                 // Ensure shapes stay within bounds and position isn't occupied
                 if ((newPosition.x >= 0 && newPosition.x < _gridManager.Width) &&
                     (newPosition.y >= 0 && newPosition.y < _gridManager.Height) &&
-                        (!occupiedPositions.Contains(newPosition)))
+                        (!occupiedPositions.Contains(newPosition)) &&
+                        (!_completedShapes.Contains(shape)))
                 {
                     // Update shape position
                     shape.GridPosition = newPosition;
@@ -137,11 +144,26 @@ public class ShapeManager : MonoBehaviour
                     Debug.Log($"Shape {shape.name} blocked from moving to {newPosition}");
                     occupiedPositions.Add(shape.GridPosition);
                 }
+
+                // Complete shape if moved to respective ghost shape
+                CheckShapeCompletion(shape);
             }
             else
             {
-                // Shape doesn't move, so mark position as occupied
+                // Shape doesn't move, so mark current position as occupied
                 occupiedPositions.Add(shape.GridPosition);
+            }
+        }
+    }
+
+    private void CheckShapeCompletion(Shape shape)
+    {
+        foreach (var ghostShape in _ghostShapes)
+        {
+            if ((shape.EdgeCount == ghostShape.EdgeCount) &&
+                (shape.GridPosition.Equals(ghostShape.GridPosition)))
+            {
+                _completedShapes.Add(shape);
             }
         }
     }
