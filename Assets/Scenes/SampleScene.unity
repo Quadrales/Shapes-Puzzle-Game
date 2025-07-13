@@ -203,16 +203,16 @@ MonoBehaviour:
   - {fileID: 4336849171002137063, guid: 5834dafd69e382447951bc6488030845, type: 3}
   _startingPositions:
   - {x: 0, y: 0}
-  - {x: 1, y: 1}
-  - {x: 2, y: 2}
+  - {x: 1, y: 0}
+  - {x: 0, y: 2}
   _ghostShapePrefabs:
   - {fileID: 2358223514503129281, guid: 39b0a237e8ada214ba70b31535c52580, type: 3}
   - {fileID: 8962216153291555913, guid: a687797d42deb0d4cb2ab1ce2836d687, type: 3}
   - {fileID: 3025994135358594287, guid: a0ab53a33733fb945abd9b7e9c53cd6e, type: 3}
   _ghostStartingPositions:
-  - {x: 3, y: 3}
-  - {x: 4, y: 4}
-  - {x: 5, y: 5}
+  - {x: 2, y: 3}
+  - {x: 4, y: 7}
+  - {x: 6, y: 5}
   _gridManager: {fileID: 194485433}
   shapeMovement:
     m_Name: Shape Movement
@@ -371,6 +371,51 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1510862484
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1510862486}
+  - component: {fileID: 1510862485}
+  m_Layer: 0
+  m_Name: PuzzleManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1510862485
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1510862484}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76969aa5bfa734a41bcc34fd7a378f2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shapeManager: {fileID: 236063704}
+--- !u!4 &1510862486
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1510862484}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -378,3 +423,4 @@ SceneRoots:
   - {fileID: 194485434}
   - {fileID: 519420032}
   - {fileID: 236063705}
+  - {fileID: 1510862486}

@@ -6,7 +6,6 @@ public class Tile : MonoBehaviour
 {
     [SerializeField] private SpriteRenderer _renderer;
 
-
     public void Init()
     {
         

@@ -4,25 +4,48 @@ using System.Collections.Generic;
 using System.Globalization;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 
 public class ShapeManager : MonoBehaviour
 {
+    // Prefabs, shape start positions, and grid manager
     [SerializeField] private List<GameObject> _shapePrefabs;
     [SerializeField] private List<Vector2Int> _startingPositions;
     [SerializeField] private List<GameObject> _ghostShapePrefabs;
     [SerializeField] private List<Vector2Int> _ghostStartingPositions;
     [SerializeField] GridManager _gridManager;
 
+    // Shape related fields
     private List<Shape> _shapes = new List<Shape>();
     private List<Shape> _ghostShapes = new List<Shape>();
-    private int _moveCount = 0;
     private List<Shape> _completedShapes = new List<Shape>();
     private int _smallestEdgeCount = 1;
 
-    public InputAction shapeMovement;
+    public bool PuzzleComplete { get; set; } = false;
 
+    // Movement related fields
+    public InputAction shapeMovement;
     [SerializeField] private float moveCooldown = 0.3f;
     private float moveTimer;
+    private int _moveCount = 0;
+
+    public void HandleShapeMovement()
+    {
+        // fix move cooldown, still doesn't work (probably bc there is no use of OnEnable or OnDisable)
+        moveTimer -= Time.deltaTime;
+
+        Vector2 moveInput = shapeMovement.ReadValue<Vector2>();
+        Vector2Int moveDirection = new Vector2Int(Mathf.RoundToInt(moveInput.x), Mathf.RoundToInt(moveInput.y));
+
+        if (moveDirection != Vector2Int.zero && moveTimer <= 0f)
+        {
+            _moveCount += _smallestEdgeCount;
+            Debug.Log("Move count: " + _moveCount);
+            Debug.Log("Smallest edge count: " + _smallestEdgeCount);
+            MoveShapes(moveDirection, _smallestEdgeCount);
+            moveTimer = moveCooldown;
+        }
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -74,25 +97,6 @@ public class ShapeManager : MonoBehaviour
     private void OnDisable()
     {
         shapeMovement.Disable();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        // fix move cooldown, still doesn't work
-        moveTimer -= Time.deltaTime;
-
-        Vector2 moveInput = shapeMovement.ReadValue<Vector2>();
-        Vector2Int moveDirection = new Vector2Int(Mathf.RoundToInt(moveInput.x), Mathf.RoundToInt(moveInput.y));
-
-        if (moveDirection != Vector2Int.zero && moveTimer <= 0f)
-        {
-            _moveCount += _smallestEdgeCount;
-            Debug.Log("Move count: " + _moveCount);
-            Debug.Log("Smallest edge count: " + _smallestEdgeCount);
-            MoveShapes(moveDirection, _smallestEdgeCount);
-            moveTimer = moveCooldown;
-        }
     }
 
     private void MoveShapes(Vector2Int direction, int minEdgeCount)
@@ -147,6 +151,11 @@ public class ShapeManager : MonoBehaviour
 
                     // Complete shape if moved to respective ghost shape
                     CheckShapeCompletion(shape);
+
+                    if (CheckPuzzleCompletion())
+                    {
+                        PuzzleComplete = true;
+                    }
                 }
                 else
                 {
@@ -173,6 +182,19 @@ public class ShapeManager : MonoBehaviour
         return false;
     }
 
+    private bool CheckPuzzleCompletion()
+    {
+        foreach (Shape shape in _shapes)
+        {
+            if (!_completedShapes.Contains(shape))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private void CheckShapeCompletion(Shape shape)
     {
         foreach (var ghostShape in _ghostShapes)
@@ -181,7 +203,6 @@ public class ShapeManager : MonoBehaviour
                 (shape.GridPosition.Equals(ghostShape.GridPosition)))
             {
                 _completedShapes.Add(shape);
-                _moveCount = 0; // Reset so new move increment works with all shapes
                 _smallestEdgeCount = FindSmallestEdgeCount();
             }
         }
