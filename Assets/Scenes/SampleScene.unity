@@ -150,7 +150,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _width: 8
   _height: 8
-  _tilePrefab: {fileID: 8071168377517818557, guid: 39b3d33d3c887d04d82519dd86a45ed2, type: 3}
+  _tileLightPrefab: {fileID: -1877278626525941915, guid: 07cbbc02aa20c344685d74ab25fa318e, type: 3}
+  _tileDarkPrefab: {fileID: -7988262999457795235, guid: a9ccdfdc3539d584eb3810b5eb0d160d, type: 3}
   _cam: {fileID: 519420032}
 --- !u!4 &194485434
 Transform:

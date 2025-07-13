@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -16,6 +17,7 @@ public class ShapeManager : MonoBehaviour
     private List<Shape> _ghostShapes = new List<Shape>();
     private int _moveCount = 0;
     private List<Shape> _completedShapes = new List<Shape>();
+    private int _smallestEdgeCount = 1;
 
     public InputAction shapeMovement;
 
@@ -27,11 +29,6 @@ public class ShapeManager : MonoBehaviour
     {
         InstantiateShapes(_shapePrefabs, _startingPositions, _shapes);
         InstantiateShapes(_ghostShapePrefabs, _ghostStartingPositions, _ghostShapes);
-
-        foreach (var ghostShape in _ghostShapes)
-        {
-            
-        }
     }
 
     private void InstantiateShapes(List<GameObject> prefabs, List<Vector2Int> startPositions, List<Shape> shapes)
@@ -90,18 +87,20 @@ public class ShapeManager : MonoBehaviour
 
         if (moveDirection != Vector2Int.zero && moveTimer <= 0f)
         {
-            _moveCount++;
-            MoveShapes(moveDirection);
+            _moveCount += _smallestEdgeCount;
+            Debug.Log("Move count: " + _moveCount);
+            Debug.Log("Smallest edge count: " + _smallestEdgeCount);
+            MoveShapes(moveDirection, _smallestEdgeCount);
             moveTimer = moveCooldown;
         }
     }
 
-    private void MoveShapes(Vector2Int direction)
+    private void MoveShapes(Vector2Int direction, int minEdgeCount)
     {
         HashSet<Vector2Int> occupiedPositions = new HashSet<Vector2Int>();
 
         // Populate set of occupied positions with shapes that won't move
-        foreach (var shape in _shapes)
+        foreach (Shape shape in _shapes)
         {
             if ((shape.EdgeCount != 1) && (_moveCount % shape.EdgeCount != 0))
             {
@@ -109,51 +108,69 @@ public class ShapeManager : MonoBehaviour
             }
         }
 
-        foreach (var shape in _shapes)
+        foreach (Shape shape in _shapes)
         {
-            // Only move if current move count is divisible by this shape's edge count
-            if ((shape.EdgeCount == 1) || (_moveCount % shape.EdgeCount == 0))
+            // Only move shapes that have not been completed
+            if (!_completedShapes.Contains(shape))
             {
-                Vector2Int currentPosition = shape.GridPosition;
-
-                int maxX = _gridManager.Width - 1;
-                int maxY = _gridManager.Height - 1;
-
-                // Calculate new grid position, ensuring a wrap-around grid
-                Vector2Int newPosition = (direction.x, direction.y, currentPosition.x, currentPosition.y) switch
+                if (ShapeShouldMove(shape, minEdgeCount))
                 {
-                    (0, 1, _, var y) when y == maxY => new Vector2Int(currentPosition.x, 0), // Up
-                    (0, -1, _, 0) => new Vector2Int(currentPosition.x, maxY), // Down
-                    (-1, 0, 0, _) => new Vector2Int(maxX, currentPosition.y), // Left
-                    (1, 0, var x, _) when x == maxX => new Vector2Int(0, currentPosition.y), // Right
-                    _ => currentPosition + direction
-                };
+                    Vector2Int currentPosition = shape.GridPosition;
 
-                // Ensure shapes stay within bounds and position isn't occupied
-                if ((newPosition.x >= 0 && newPosition.x < _gridManager.Width) &&
-                    (newPosition.y >= 0 && newPosition.y < _gridManager.Height) &&
-                        (!occupiedPositions.Contains(newPosition)) &&
-                        (!_completedShapes.Contains(shape)))
-                {
-                    // Update shape position
-                    shape.GridPosition = newPosition;
-                    shape.transform.position = new Vector3(newPosition.x, newPosition.y, 0);
+                    int maxX = _gridManager.Width - 1;
+                    int maxY = _gridManager.Height - 1;
+
+                    // Calculate new grid position, ensuring a wrap-around grid
+                    Vector2Int newPosition = (direction.x, direction.y, currentPosition.x, currentPosition.y) switch
+                    {
+                        (0, 1, _, var y) when y == maxY => new Vector2Int(currentPosition.x, 0), // Up
+                        (0, -1, _, 0) => new Vector2Int(currentPosition.x, maxY), // Down
+                        (-1, 0, 0, _) => new Vector2Int(maxX, currentPosition.y), // Left
+                        (1, 0, var x, _) when x == maxX => new Vector2Int(0, currentPosition.y), // Right
+                        _ => currentPosition + direction
+                    };
+
+                    // Ensure shapes stay within bounds and position isn't occupied
+                    if ((newPosition.x >= 0 && newPosition.x < _gridManager.Width) &&
+                        (newPosition.y >= 0 && newPosition.y < _gridManager.Height) &&
+                            (!occupiedPositions.Contains(newPosition)))
+                    {
+                        // Update shape position
+                        shape.GridPosition = newPosition;
+                        shape.transform.position = new Vector3(newPosition.x, newPosition.y, 0);
+                    }
+                    else
+                    {
+                        Debug.Log($"Shape {shape.name} blocked from moving to {newPosition}");
+                        occupiedPositions.Add(shape.GridPosition);
+                    }
+
+                    // Complete shape if moved to respective ghost shape
+                    CheckShapeCompletion(shape);
                 }
                 else
                 {
-                    Debug.Log($"Shape {shape.name} blocked from moving to {newPosition}");
+                    // Shape doesn't move, so mark current position as occupied
                     occupiedPositions.Add(shape.GridPosition);
                 }
-
-                // Complete shape if moved to respective ghost shape
-                CheckShapeCompletion(shape);
-            }
-            else
-            {
-                // Shape doesn't move, so mark current position as occupied
-                occupiedPositions.Add(shape.GridPosition);
             }
         }
+    }
+
+    private bool ShapeShouldMove(Shape shape, int minEdgeCount)
+    {
+        if (shape.EdgeCount == 1) return true;
+
+        // Only move if current or skipped move count is divisible by this shape's edge count
+        for (int i = 0; i < minEdgeCount; i++)
+        {
+            if ((_moveCount - i) % shape.EdgeCount == 0)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void CheckShapeCompletion(Shape shape)
@@ -164,7 +181,22 @@ public class ShapeManager : MonoBehaviour
                 (shape.GridPosition.Equals(ghostShape.GridPosition)))
             {
                 _completedShapes.Add(shape);
+                _moveCount = 0; // Reset so new move increment works with all shapes
+                _smallestEdgeCount = FindSmallestEdgeCount();
             }
         }
+    }
+
+    private int FindSmallestEdgeCount()
+    {
+        foreach (Shape shape in _shapes)
+        {
+            if (!_completedShapes.Contains(shape))
+            {
+                return shape.EdgeCount;
+            }
+        }
+
+        return 1;
     }
 }
