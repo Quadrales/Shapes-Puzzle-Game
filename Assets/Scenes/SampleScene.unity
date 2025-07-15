@@ -163,8 +163,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0857475d7dcfbed4a8e0e5f26676aacd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveCountText: {fileID: 5452968806198361756, guid: 378530220cec9c34a9b9f20e8542af52, type: 3}
-  moveLimitText: {fileID: 2607201655326756620, guid: ffc5d816ee89613418992e0dd0e82a52, type: 3}
+  textCanvas: {fileID: 1354425806}
+  moveCountPrefab: {fileID: 2828267963951814374, guid: 378530220cec9c34a9b9f20e8542af52, type: 3}
+  moveLimitPrefab: {fileID: 1629112813836521704, guid: ffc5d816ee89613418992e0dd0e82a52, type: 3}
 --- !u!1 &194485432
 GameObject:
   m_ObjectHideFlags: 0
@@ -260,6 +261,7 @@ MonoBehaviour:
   - {x: 4, y: 7}
   - {x: 6, y: 5}
   _gridManager: {fileID: 194485433}
+  _moveCountTextManager: {fileID: 151510782}
   shapeMovement:
     m_Name: Shape Movement
     m_Type: 0
@@ -309,7 +311,7 @@ MonoBehaviour:
       m_Action: Shape Movement
       m_Flags: 8
     m_Flags: 0
-  moveCooldown: 0.2
+  moveCooldown: 0.25
 --- !u!4 &236063705
 Transform:
   m_ObjectHideFlags: 0

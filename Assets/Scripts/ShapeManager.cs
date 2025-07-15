@@ -14,6 +14,7 @@ public class ShapeManager : MonoBehaviour
     [SerializeField] private List<GameObject> _ghostShapePrefabs;
     [SerializeField] private List<Vector2Int> _ghostStartingPositions;
     [SerializeField] GridManager _gridManager;
+    [SerializeField] MoveCountTextManager _moveCountTextManager;
 
     // Shape related fields
     private List<Shape> _shapes = new List<Shape>();
@@ -40,8 +41,8 @@ public class ShapeManager : MonoBehaviour
         if (moveDirection != Vector2Int.zero && moveTimer <= 0f)
         {
             _moveCount += _smallestEdgeCount;
-            Debug.Log("Move count: " + _moveCount);
-            Debug.Log("Smallest edge count: " + _smallestEdgeCount);
+            _moveCountTextManager.UpdateMoveCountText(_moveCount);
+
             MoveShapes(moveDirection, _smallestEdgeCount);
             moveTimer = moveCooldown;
         }
