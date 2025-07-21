@@ -11,13 +11,12 @@ public class MoveCountTextManager : MonoBehaviour
     private Vector3 moveCountPosition = new Vector3(320, 140, 0);
     private Vector3 moveLimitPosition = new Vector3(320, 180, 0);
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public void InstantiateTextUI(int moveLimit)
     {
         InstantiateText();
 
         moveCountText.text = "0";
-        moveLimitText.text = "40"; // later set this to the move limit of the current level
+        moveLimitText.text = moveLimit.ToString();
     }
 
     public void UpdateMoveCountText(int moveCount)

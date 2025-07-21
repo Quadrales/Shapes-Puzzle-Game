@@ -10,9 +10,7 @@ public class ShapeManager : MonoBehaviour
 {
     // Prefabs, shape start positions, and grid manager
     [SerializeField] private List<GameObject> _shapePrefabs;
-    [SerializeField] private List<Vector2Int> _startingPositions;
     [SerializeField] private List<GameObject> _ghostShapePrefabs;
-    [SerializeField] private List<Vector2Int> _ghostStartingPositions;
     [SerializeField] GridManager _gridManager;
     [SerializeField] MoveCountTextManager _moveCountTextManager;
 
@@ -30,29 +28,12 @@ public class ShapeManager : MonoBehaviour
     private float moveTimer;
     private int _moveCount = 0;
 
-    public void HandleShapeMovement()
+    public void LoadCurrentPuzzle(PuzzleData currentPuzzle)
     {
-        // fix move cooldown, still doesn't work (probably bc there is no use of OnEnable or OnDisable)
-        moveTimer -= Time.deltaTime;
+        _moveCountTextManager.InstantiateTextUI(currentPuzzle.MoveLimit);
 
-        Vector2 moveInput = shapeMovement.ReadValue<Vector2>();
-        Vector2Int moveDirection = new Vector2Int(Mathf.RoundToInt(moveInput.x), Mathf.RoundToInt(moveInput.y));
-
-        if (moveDirection != Vector2Int.zero && moveTimer <= 0f)
-        {
-            _moveCount += _smallestEdgeCount;
-            _moveCountTextManager.UpdateMoveCountText(_moveCount);
-
-            MoveShapes(moveDirection, _smallestEdgeCount);
-            moveTimer = moveCooldown;
-        }
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        InstantiateShapes(_shapePrefabs, _startingPositions, _shapes);
-        InstantiateShapes(_ghostShapePrefabs, _ghostStartingPositions, _ghostShapes);
+        InstantiateShapes(_shapePrefabs, currentPuzzle.ShapeStartingPositions, _shapes);
+        InstantiateShapes(_ghostShapePrefabs, currentPuzzle.GhostShapeStartingPositions, _ghostShapes);
     }
 
     private void InstantiateShapes(List<GameObject> prefabs, List<Vector2Int> startPositions, List<Shape> shapes)
@@ -87,6 +68,32 @@ public class ShapeManager : MonoBehaviour
             {
                 Debug.LogError($"Shape component missing on prefab: {prefabs[i].name}");
             }
+        }
+    }
+
+    private void Update()
+    {
+        if (!PuzzleComplete)
+        {
+            HandleShapeMovement();
+        }
+    }
+
+    public void HandleShapeMovement()
+    {
+        // fix move cooldown, still doesn't work (probably bc there is no use of OnEnable or OnDisable)
+        moveTimer -= Time.deltaTime;
+
+        Vector2 moveInput = shapeMovement.ReadValue<Vector2>();
+        Vector2Int moveDirection = new Vector2Int(Mathf.RoundToInt(moveInput.x), Mathf.RoundToInt(moveInput.y));
+
+        if (moveDirection != Vector2Int.zero && moveTimer <= 0f)
+        {
+            _moveCount += _smallestEdgeCount;
+            _moveCountTextManager.UpdateMoveCountText(_moveCount);
+
+            MoveShapes(moveDirection, _smallestEdgeCount);
+            moveTimer = moveCooldown;
         }
     }
 
