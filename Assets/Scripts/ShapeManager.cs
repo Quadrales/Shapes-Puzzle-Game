@@ -12,7 +12,7 @@ public class ShapeManager : MonoBehaviour
     [SerializeField] private List<GameObject> _shapePrefabs;
     [SerializeField] private List<GameObject> _ghostShapePrefabs;
     [SerializeField] GridManager _gridManager;
-    [SerializeField] MoveCountTextManager _moveCountTextManager;
+    [SerializeField] PuzzleTextManager _puzzleTextManager;
 
     // Shape related fields
     private List<Shape> _shapes = new List<Shape>();
@@ -30,7 +30,7 @@ public class ShapeManager : MonoBehaviour
 
     public void LoadCurrentPuzzle(PuzzleData currentPuzzle)
     {
-        _moveCountTextManager.InstantiateTextUI(currentPuzzle.MoveLimit);
+        _puzzleTextManager.InstantiateTextUI(currentPuzzle.MoveLimit);
 
         InstantiateShapes(_shapePrefabs, currentPuzzle.ShapeStartingPositions, _shapes);
         InstantiateShapes(_ghostShapePrefabs, currentPuzzle.GhostShapeStartingPositions, _ghostShapes);
@@ -90,7 +90,7 @@ public class ShapeManager : MonoBehaviour
         if (moveDirection != Vector2Int.zero && moveTimer <= 0f)
         {
             _moveCount += _smallestEdgeCount;
-            _moveCountTextManager.UpdateMoveCountText(_moveCount);
+            _puzzleTextManager.UpdateMoveCountText(_moveCount);
 
             MoveShapes(moveDirection, _smallestEdgeCount);
             moveTimer = moveCooldown;

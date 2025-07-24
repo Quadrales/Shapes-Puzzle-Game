@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine;
 
-public class MoveCountTextManager : MonoBehaviour
+public class PuzzleTextManager : MonoBehaviour
 {
     [SerializeField] private Canvas textCanvas;
     [SerializeField] private GameObject moveCountPrefab;
