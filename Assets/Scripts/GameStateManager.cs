@@ -15,4 +15,10 @@ public class GameStateManager : MonoBehaviour
     {
         
     }
+
+    public void ExitGame()
+    {
+        Application.Quit();
+        Debug.Log("Exit game.");
+    }
 }
