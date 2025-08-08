@@ -85,7 +85,25 @@ public class ShapeManager : MonoBehaviour
         moveTimer -= Time.deltaTime;
 
         Vector2 moveInput = shapeMovement.ReadValue<Vector2>();
-        Vector2Int moveDirection = new Vector2Int(Mathf.RoundToInt(moveInput.x), Mathf.RoundToInt(moveInput.y));
+
+        int x = Mathf.RoundToInt(moveInput.x);
+        int y = Mathf.RoundToInt(moveInput.y);
+
+        // Prevent diagonal movement by taking larger input vector value (horizontal or vertical)
+        if (x != 0 && y != 0)
+        {
+            // Prioritising horizontal movement
+            if (Mathf.Abs(moveInput.y) > Mathf.Abs(moveInput.x))
+            {
+                x = 0;
+            }
+            else
+            {
+                y = 0;
+            }
+        }
+
+        Vector2Int moveDirection = new Vector2Int(x, y);
 
         if (moveDirection != Vector2Int.zero && moveTimer <= 0f)
         {
