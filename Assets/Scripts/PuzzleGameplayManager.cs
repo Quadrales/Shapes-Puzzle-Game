@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
-public class ShapeManager : MonoBehaviour
+public class PuzzleGameplayManager : MonoBehaviour
 {
     // Prefabs, shape start positions, and grid manager
     [SerializeField] private List<GameObject> _shapePrefabs;
@@ -24,13 +24,16 @@ public class ShapeManager : MonoBehaviour
 
     // Movement related fields
     public InputAction shapeMovement;
-    [SerializeField] private float moveCooldown = 0.3f;
+    [SerializeField] private float moveCooldown = 0.3f; // Default cooldown of 0.3s
     private float moveTimer;
     private int _moveCount = 0;
+    private int _moveLimit = 0;
 
     public void LoadCurrentPuzzle(PuzzleData currentPuzzle)
     {
-        _puzzleTextManager.InstantiateTextUI(currentPuzzle.MoveLimit);
+        _moveLimit = currentPuzzle.MoveLimit;
+
+        _puzzleTextManager.InstantiateTextUI(_moveLimit);
 
         InstantiateShapes(_shapePrefabs, currentPuzzle.ShapeStartingPositions, _shapes);
         InstantiateShapes(_ghostShapePrefabs, currentPuzzle.GhostShapeStartingPositions, _ghostShapes);
@@ -81,7 +84,6 @@ public class ShapeManager : MonoBehaviour
 
     public void HandleShapeMovement()
     {
-        // fix move cooldown, still doesn't work (probably bc there is no use of OnEnable or OnDisable)
         moveTimer -= Time.deltaTime;
 
         Vector2 moveInput = shapeMovement.ReadValue<Vector2>();
@@ -143,7 +145,9 @@ public class ShapeManager : MonoBehaviour
             // Only move shapes that have not been completed
             if (!_completedShapes.Contains(shape))
             {
-                if (ShapeShouldMove(shape, minEdgeCount))
+                // Check if shape should move
+                int moveCountDecrement = ShapeShouldMove(shape, minEdgeCount);
+                if (moveCountDecrement != -1)
                 {
                     Vector2Int currentPosition = shape.GridPosition;
 
@@ -178,8 +182,13 @@ public class ShapeManager : MonoBehaviour
                     // Complete shape if moved to respective ghost shape
                     CheckShapeCompletion(shape);
 
+                    // Complete puzzle if all shapes in correct positions
                     if (CheckPuzzleCompletion())
                     {
+                        // Subtract excess moves when shape with larger edge count than moves needed completes puzzle
+                        _moveCount -= moveCountDecrement;
+                        _puzzleTextManager.UpdateMoveCountText(_moveCount);
+
                         PuzzleComplete = true;
                     }
                 }
@@ -192,20 +201,21 @@ public class ShapeManager : MonoBehaviour
         }
     }
 
-    private bool ShapeShouldMove(Shape shape, int minEdgeCount)
+    // Returns -1 if false, otherwise returns possible move decrement if shape completes puzzle
+    private int ShapeShouldMove(Shape shape, int minEdgeCount)
     {
-        if (shape.EdgeCount == 1) return true;
+        if (shape.EdgeCount == 1) return 1;
 
         // Only move if current or skipped move count is divisible by this shape's edge count
         for (int i = 0; i < minEdgeCount; i++)
         {
             if ((_moveCount - i) % shape.EdgeCount == 0)
             {
-                return true;
+                return i; // Decrement of move count post-completion of puzzle
             }
         }
 
-        return false;
+        return -1; // Don't move
     }
 
     private bool CheckPuzzleCompletion()
@@ -216,6 +226,11 @@ public class ShapeManager : MonoBehaviour
             {
                 return false;
             }
+        }
+
+        if (_moveCount > _moveLimit)
+        {
+            return false;
         }
 
         return true;

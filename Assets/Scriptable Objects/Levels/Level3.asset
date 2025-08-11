@@ -20,4 +20,4 @@ MonoBehaviour:
   - {x: 2, y: 3}
   - {x: 6, y: 0}
   - {x: 3, y: 5}
-  moveLimit: 35
+  moveLimit: 30

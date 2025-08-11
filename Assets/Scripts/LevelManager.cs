@@ -5,7 +5,7 @@ using UnityEngine;
 public class LevelManager : MonoBehaviour
 {
     [SerializeField] private PuzzleData[] levels;
-    [SerializeField] private ShapeManager shapeManager;
+    [SerializeField] private PuzzleGameplayManager puzzleGameplayManager;
 
     [SerializeField] private GameObject puzzleObjects;
     [SerializeField] private GameObject levelSelectionMenu;
@@ -14,7 +14,7 @@ public class LevelManager : MonoBehaviour
     {
         puzzleObjects.SetActive(true);
 
-        shapeManager.LoadCurrentPuzzle(levels[levelIndex - 1]);
+        puzzleGameplayManager.LoadCurrentPuzzle(levels[levelIndex - 1]);
     }
 
     public void CloseLevelSelectionMenu()
