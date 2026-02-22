@@ -21,6 +21,7 @@ public class PuzzleGameplayManager : MonoBehaviour
     private int _smallestEdgeCount = 1;
 
     public bool PuzzleComplete { get; set; } = false;
+    // add PuzzleFailed field?
 
     // Movement related fields
     public InputAction shapeMovement;
@@ -76,10 +77,13 @@ public class PuzzleGameplayManager : MonoBehaviour
 
     private void Update()
     {
-        if (!PuzzleComplete)
+        // might be better to put this in FixedUpdate but I'm not too sure
+        if (!PuzzleComplete && _moveCount < _moveLimit)
         {
             HandleShapeMovement();
         }
+
+        // handle winning/losing (if lost, either reset immediately or put up a fail screen then ask to reset)
     }
 
     public void HandleShapeMovement()
@@ -204,7 +208,8 @@ public class PuzzleGameplayManager : MonoBehaviour
     // Returns -1 if false, otherwise returns possible move decrement if shape completes puzzle
     private int ShapeShouldMove(Shape shape, int minEdgeCount)
     {
-        if (shape.EdgeCount == 1) return 1;
+        // If shape is circle, there should be no count decrement
+        if (shape.EdgeCount == 1) return 0;
 
         // Only move if current or skipped move count is divisible by this shape's edge count
         for (int i = 0; i < minEdgeCount; i++)
